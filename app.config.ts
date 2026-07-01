@@ -8,7 +8,7 @@ const isProduction = process.env.EAS_BUILD_PROFILE === 'production';
 
 const config: ExpoConfig = {
   name: 'OnBoard Health',
-  slug: 'onboardhealth',
+  slug: 'zeosoftio',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
