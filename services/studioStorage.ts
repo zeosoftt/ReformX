@@ -1,5 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import {
   CLIENT_GOAL_OPTIONS,
   defaultClientBaseline,
@@ -9,6 +7,8 @@ import {
   type ClientGoalId,
   type StudioState,
 } from '@/types/studio';
+import { storageKeys } from '@/lib/storage/keys';
+import { appStorage } from '@/lib/storage/appStorage';
 import { rolloverClientPackage } from '@/utils/packagePeriod';
 
 const VALID_GOAL_IDS = new Set<ClientGoalId>(CLIENT_GOAL_OPTIONS.map((o) => o.id));
@@ -37,7 +37,7 @@ function migrateBaseline(raw: unknown): ClientBaseline {
   };
 }
 
-const STORAGE_KEY = '@pilatesstudio/state/v1';
+const STORAGE_KEY = storageKeys.studioState;
 
 const emptyState = (): StudioState => ({
   clients: [],
@@ -66,7 +66,7 @@ function migrateAppointment(raw: Appointment): Appointment {
 
 export async function loadStudioState(): Promise<StudioState> {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    const raw = await appStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyState();
     const parsed = JSON.parse(raw) as StudioState;
     if (!parsed.clients || !parsed.appointments) return emptyState();
@@ -80,5 +80,5 @@ export async function loadStudioState(): Promise<StudioState> {
 }
 
 export async function saveStudioState(state: StudioState): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  await appStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }

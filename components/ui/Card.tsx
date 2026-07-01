@@ -1,17 +1,32 @@
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
+import { radius, shadows, spacing } from '@/constants/theme';
 import { useAppColors } from '@/hooks/useAppColors';
 
-export function Card({ style, children, ...rest }: ViewProps) {
+type Props = ViewProps & {
+  elevated?: boolean;
+  /** Sol kenar vurgusu — sektör / klinik kartları */
+  accent?: 'primary' | 'accent' | 'clinical' | 'none';
+};
+
+export function Card({ style, children, elevated, accent = 'none', ...rest }: Props) {
   const c = useAppColors();
+  const accentColor =
+    accent === 'clinical' ? c.clinical : accent === 'accent' ? c.accent : c.primary;
+
   return (
     <View
       style={[
         styles.card,
+        shadows.card,
         {
-          backgroundColor: c.surface,
-          borderColor: c.border,
+          backgroundColor: elevated ? c.surfaceElevated : c.surface,
+          borderColor: c.borderNeutral,
           shadowColor: c.text,
+        },
+        accent !== 'none' && {
+          borderLeftWidth: 3,
+          borderLeftColor: accentColor,
         },
         style,
       ]}
@@ -23,12 +38,8 @@ export function Card({ style, children, ...rest }: ViewProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: radius.xl,
     borderWidth: StyleSheet.hairlineWidth,
-    padding: 16,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 3,
+    padding: spacing.lg,
   },
 });

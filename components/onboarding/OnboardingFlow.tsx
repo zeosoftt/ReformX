@@ -20,6 +20,7 @@ import { saveStudioProfile } from '@/services/studioProfileStorage';
 import { setOnboardingCompleted } from '@/services/onboardingStorage';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
+import { BrandMark, ProductLabel } from '@/components/ui/BrandMark';
 import {
   defaultStudioProfile,
   PRIORITY_OPTIONS,
@@ -51,8 +52,8 @@ function ServiceChip({
       style={[
         styles.chip,
         {
-          borderColor: active ? c.primary : c.border,
-          backgroundColor: active ? c.primary + '18' : c.background,
+          borderColor: active ? c.primary : c.borderNeutral,
+          backgroundColor: active ? c.primarySubtle : c.surface,
         },
       ]}>
       <AppText style={{ fontWeight: '600', fontSize: 14, color: active ? c.primary : c.text }}>
@@ -79,8 +80,8 @@ function MinuteChip({
       style={[
         styles.chip,
         {
-          borderColor: active ? c.primary : c.border,
-          backgroundColor: active ? c.primary + '18' : c.background,
+          borderColor: active ? c.primary : c.borderNeutral,
+          backgroundColor: active ? c.primarySubtle : c.surface,
         },
       ]}>
       <AppText style={{ fontWeight: '700', color: active ? c.primary : c.text }}>{value} dk</AppText>
@@ -167,21 +168,25 @@ export function OnboardingFlow() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           {step === 0 && (
-            <>
-              <View style={[styles.heroIcon, { backgroundColor: c.surface }]}>
-                <FontAwesome name="building" size={36} color={c.primary} />
-              </View>
-              <AppText variant="title" style={styles.centerTitle}>
-                Hoş geldiniz
+            <View style={styles.welcomeBlock}>
+              <BrandMark size="lg" />
+              <ProductLabel showTagline />
+              <AppText variant="display" style={[styles.centerTitle, { marginTop: 20 }]}>
+                Stüdyonuzu tanıyalım
               </AppText>
               <AppText variant="muted" style={styles.centerBody}>
-                Stüdyonuzu birkaç adımda tanıyalım. Kapasite, hizmetler ve önceliklerinize göre özet
-                ekranınız şekillenecek.
+                Pilates stüdyosu veya fizyoterapi merkezi fark etmez — kapasite, hizmetler ve
+                önceliklerinize göre yönetim paneliniz şekillenir.
               </AppText>
               <AppText variant="caption" muted style={{ marginTop: 16, textAlign: 'center' }}>
-                Her adımda sağ üstten tüm kurulumu atlayabilirsiniz.
+                Kurulumu istediğiniz zaman sağ üstten atlayabilirsiniz.
               </AppText>
-            </>
+              <Pressable onPress={() => router.push('/privacy-policy')} style={{ marginTop: 12 }}>
+                <AppText variant="caption" style={{ color: c.primary, textAlign: 'center', fontWeight: '600' }}>
+                  Gizlilik politikasını oku
+                </AppText>
+              </Pressable>
+            </View>
           )}
 
           {step === 1 && (
@@ -524,16 +529,7 @@ const styles = StyleSheet.create({
   },
   progressFill: { height: '100%', borderRadius: 2 },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 24 },
-  heroIcon: {
-    width: 88,
-    height: 88,
-    borderRadius: 28,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    marginTop: 8,
-  },
+  welcomeBlock: { alignItems: 'center', paddingTop: 8 },
   centerTitle: { textAlign: 'center', marginBottom: 12 },
   centerBody: { textAlign: 'center', lineHeight: 22 },
   stepTitle: { marginBottom: 8, marginTop: 4 },

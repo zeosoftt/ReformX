@@ -10,40 +10,13 @@ export function useUrgencyColors() {
   return useMemo(
     () =>
       ({
-        live: {
-          border: '#7C3AED',
-          bg: 'rgba(124, 58, 237, 0.12)',
-          badge: '#7C3AED',
-        },
-        ended: {
-          border: c.border,
-          bg: 'rgba(142, 142, 147, 0.12)',
-          badge: c.textMuted,
-        },
-        imminent: {
-          border: '#EA580C',
-          bg: 'rgba(234, 88, 12, 0.12)',
-          badge: '#EA580C',
-        },
-        soon: {
-          border: '#CA8A04',
-          bg: 'rgba(202, 138, 4, 0.12)',
-          badge: '#CA8A04',
-        },
-        today: {
-          border: c.primary,
-          bg: 'rgba(61, 90, 79, 0.1)',
-          badge: c.primary,
-        },
-        later: {
-          border: c.border,
-          bg: c.surface,
-          badge: c.textMuted,
-        },
-      }) satisfies Record<
-        UrgencyKey,
-        { border: string; bg: string; badge: string }
-      >,
-    [c.border, c.primary, c.surface, c.textMuted]
+        live: { border: c.live, bg: c.liveSubtle, badge: c.live },
+        ended: { border: c.border, bg: 'rgba(142, 142, 147, 0.12)', badge: c.textMuted },
+        imminent: { border: c.urgent, bg: c.urgentSubtle, badge: c.urgent },
+        soon: { border: c.warning, bg: c.warningSubtle, badge: c.warning },
+        today: { border: c.primary, bg: c.primarySubtle, badge: c.primary },
+        later: { border: c.border, bg: c.surface, badge: c.textMuted },
+      }) satisfies Record<UrgencyKey, { border: string; bg: string; badge: string }>,
+    [c]
   );
 }

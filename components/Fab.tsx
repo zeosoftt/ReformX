@@ -1,6 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
+import { layout, radius, spacing } from '@/constants/theme';
 import { useAppColors } from '@/hooks/useAppColors';
 
 type Props = {
@@ -16,11 +17,15 @@ export function Fab({ onPress, icon = 'plus' }: Props) {
         onPress={onPress}
         style={({ pressed }) => [
           styles.fab,
-          { backgroundColor: c.primary, opacity: pressed ? 0.9 : 1 },
+          {
+            backgroundColor: c.primary,
+            opacity: pressed ? 0.9 : 1,
+            shadowColor: c.text,
+          },
         ]}
         accessibilityRole="button"
         accessibilityLabel="Yeni ekle">
-        <FontAwesome name={icon} size={22} color="#fff" />
+        <FontAwesome name={icon} size={22} color={c.onPrimary} />
       </Pressable>
     </View>
   );
@@ -29,19 +34,19 @@ export function Fab({ onPress, icon = 'plus' }: Props) {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    right: 20,
-    bottom: 24,
+    right: spacing.xl,
+    bottom: Platform.OS === 'web' ? spacing.xxl : spacing.xl,
+    maxWidth: layout.maxContentWidth,
   },
   fab: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
     elevation: 6,
   },
 });

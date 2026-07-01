@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
+import { radius } from '@/constants/theme';
 import { useAppColors } from '@/hooks/useAppColors';
 
 type Props = {
@@ -15,9 +16,8 @@ export function AppButton({ label, onPress, variant = 'primary', disabled, loadi
   const isGhost = variant === 'ghost';
   const isDanger = variant === 'danger';
 
-  const bg =
-    isGhost ? 'transparent' : isDanger ? c.danger : c.primary;
-  const fg = isGhost ? c.primary : '#FFFFFF';
+  const bg = isGhost ? 'transparent' : isDanger ? c.danger : c.primary;
+  const fg = isGhost ? c.primary : c.onPrimary;
 
   return (
     <Pressable
@@ -29,7 +29,7 @@ export function AppButton({ label, onPress, variant = 'primary', disabled, loadi
           backgroundColor: bg,
           opacity: pressed ? 0.88 : disabled ? 0.45 : 1,
           borderWidth: isGhost ? 1.5 : 0,
-          borderColor: c.primary,
+          borderColor: isGhost ? c.primary : 'transparent',
         },
       ]}>
       {loading ? (
@@ -43,13 +43,12 @@ export function AppButton({ label, onPress, variant = 'primary', disabled, loadi
 
 const styles = StyleSheet.create({
   btn: {
-    borderRadius: 14,
+    borderRadius: radius.md,
     paddingVertical: 14,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 50,
   },
-  row: { flexDirection: 'row', alignItems: 'center' },
   label: { fontSize: 16, fontWeight: '600' },
 });

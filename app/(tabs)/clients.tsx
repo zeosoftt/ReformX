@@ -7,6 +7,9 @@ import { Fab } from '@/components/Fab';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/ui/AppText';
 import { Card } from '@/components/ui/Card';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { brand } from '@/constants/brand';
+import { layout, radius, spacing } from '@/constants/theme';
 import { useStudio } from '@/context/StudioContext';
 import { useAppColors } from '@/hooks/useAppColors';
 import { baselineSummary, clientGoalLabel, type Client } from '@/types/studio';
@@ -52,17 +55,19 @@ export default function ClientsScreen() {
   }
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <AppText variant="title">Danışanlar</AppText>
-        <AppText variant="muted" style={{ marginTop: 4 }}>
-          Paket, hedefler ve iletişim bilgileri.
-        </AppText>
-      </View>
+    <Screen padded={false}>
       <FlatList
         style={styles.listFlex}
         data={state.clients}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <PageHeader
+            title="Danışanlar"
+            subtitle={`${brand.tagline} — paket, hedefler ve iletişim.`}
+            style={styles.header}
+          />
+        }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <Card>
@@ -85,7 +90,7 @@ export default function ClientsScreen() {
                   <Pressable
                     onPress={() => setQuickApptClient(item)}
                     hitSlop={8}
-                    style={styles.quickAppt}>
+                    style={[styles.quickAppt, { backgroundColor: c.primarySubtle }]}>
                     <AppText variant="caption" style={{ color: c.primary, fontWeight: '600' }}>
                       Randevu
                     </AppText>
@@ -109,7 +114,7 @@ export default function ClientsScreen() {
                   </View>
                 )}
                 {baselineText != null && (
-                  <AppText variant="caption" muted style={{ marginTop: 8, lineHeight: 18 }}>
+                  <AppText variant="caption" muted style={{ marginTop: spacing.sm, lineHeight: 18 }}>
                     Başlangıç: {baselineText}
                   </AppText>
                 )}
@@ -118,7 +123,7 @@ export default function ClientsScreen() {
                     {item.goals.map((gid) => (
                       <View
                         key={gid}
-                        style={[styles.goalPill, { borderColor: c.border, backgroundColor: c.primary + '14' }]}>
+                        style={[styles.goalPill, { borderColor: c.border, backgroundColor: c.primarySubtle }]}>
                         <AppText style={{ fontSize: 11, fontWeight: '600', color: c.primary }}>
                           {clientGoalLabel(gid)}
                         </AppText>
@@ -127,7 +132,7 @@ export default function ClientsScreen() {
                   </View>
                 )}
                 {!!item.phone && (
-                  <AppText variant="muted" style={{ marginTop: 4 }}>
+                  <AppText variant="muted" style={{ marginTop: spacing.xs }}>
                     {item.phone}
                   </AppText>
                 )}
@@ -166,29 +171,36 @@ export default function ClientsScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  header: { paddingHorizontal: 20, paddingBottom: 8 },
+  header: {
+    paddingHorizontal: layout.screenPaddingHorizontal,
+    paddingTop: spacing.sm,
+  },
   listFlex: { flex: 1 },
-  list: { paddingHorizontal: 20, paddingBottom: 96, gap: 10 },
+  list: {
+    paddingHorizontal: layout.screenPaddingHorizontal,
+    paddingBottom: layout.fabClearance,
+    gap: spacing.md,
+  },
   rowCard: { marginBottom: 0 },
   rowHead: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  quickAppt: { paddingVertical: 4, paddingHorizontal: 8 },
+  quickAppt: { paddingVertical: spacing.xs, paddingHorizontal: spacing.sm, borderRadius: radius.sm },
   goalsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginTop: 10,
+    marginTop: spacing.sm,
   },
   goalPill: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  pkgBlock: { marginTop: 10 },
+  pkgBlock: { marginTop: spacing.sm },
   pkgLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',

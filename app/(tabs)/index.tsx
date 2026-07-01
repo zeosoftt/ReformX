@@ -13,9 +13,14 @@ import {
 import type { SessionEntity } from '@/features/sessions/types';
 import { useOnboardingStore } from '@/features/onboarding/store';
 import { env, isSupabaseConfigured } from '@/lib/env';
+import { mvp } from '@/constants/mvp';
 import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { StatCard } from '@/components/ui/StatCard';
+import { StudioHeroHeader } from '@/components/ui/StudioHeroHeader';
 import { AppText } from '@/components/ui/AppText';
 import { Screen } from '@/components/Screen';
+import { radius, spacing } from '@/constants/theme';
 import { useStudioProfile } from '@/context/StudioProfileContext';
 import { useStudio } from '@/context/StudioContext';
 import { useAppColors } from '@/hooks/useAppColors';
@@ -68,6 +73,7 @@ export default function DashboardScreen() {
   const { ready, state, updateAppointment } = useStudio();
   const zustandStudioId = useOnboardingStore((s) => s.currentStudioId);
   const cloudStudioId = zustandStudioId ?? (env.defaultStudioId.trim() || null);
+  const showCloudPanel = mvp.cloudSyncUi && isSupabaseConfigured() && Boolean(cloudStudioId);
 
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
@@ -77,7 +83,7 @@ export default function DashboardScreen() {
   >([]);
 
   const loadCloudDashboard = useCallback(async () => {
-    if (!isSupabaseConfigured() || !cloudStudioId) return;
+    if (!mvp.cloudSyncUi || !isSupabaseConfigured() || !cloudStudioId) return;
     setCloudLoading(true);
     setCloudError(null);
     try {
@@ -101,7 +107,7 @@ export default function DashboardScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      void loadCloudDashboard();
+      if (mvp.cloudSyncUi) void loadCloudDashboard();
     }, [loadCloudDashboard])
   );
 
@@ -145,21 +151,31 @@ export default function DashboardScreen() {
     );
   }
 
-  const title = profile.studioName.trim()
-    ? `${profile.studioName.trim()} · Özet`
-    : 'Özet';
-
   return (
     <Screen scroll contentStyle={styles.content}>
-      <AppText variant="title" style={styles.headline}>
-        {title}
-      </AppText>
-      <AppText variant="muted" style={styles.sub}>
-        {prioritySubtext(profile.priority)}
-      </AppText>
+      <StudioHeroHeader
+        studioName={profile.studioName}
+        subtitle={prioritySubtext(profile.priority)}
+        services={profile.services}
+      />
+
+      {state.clients.length === 0 && (
+        <Card accent="accent" style={{ marginBottom: spacing.md }}>
+          <AppText variant="subtitle">Hoş geldiniz</AppText>
+          <AppText variant="muted" style={{ marginTop: spacing.sm, lineHeight: 22 }}>
+            Danışan ve seans verileri cihazınızda güvenle saklanır. Başlamak için Danışanlar
+            sekmesinden ilk kaydınızı oluşturun.
+          </AppText>
+          <Pressable
+            onPress={() => router.push('/clients')}
+            style={[styles.cta, { backgroundColor: c.primarySubtle, marginTop: spacing.md }]}>
+            <AppText style={{ color: c.primary, fontWeight: '700' }}>Danışan ekle →</AppText>
+          </Pressable>
+        </Card>
+      )}
 
       {profile.priority != null && (
-        <Card style={styles.priorityCard}>
+        <Card accent="primary" style={styles.priorityCard}>
           <AppText variant="subtitle">
             {profile.priority === 'musteri_kaybi' && 'Geri kazanım'}
             {profile.priority === 'randevu_kaosu' && 'Randevu düzeni'}
@@ -172,21 +188,21 @@ export default function DashboardScreen() {
             {profile.priority === 'randevu_kaosu' &&
               'Yaklaşan seanslar aciliyet renkleriyle sıralanır; aşağıda yoklama ile takip edin.'}
             {profile.priority === 'odeme_takibi' &&
-              'Paket kalanları danışan kartlarında; online ödeme tercihinizi profilde işaretlediniz.'}
+              'Paket kalanları danışan kartlarında görünür; tahsilat takibini buradan yönetin.'}
             {profile.priority === 'musteri_takibi' &&
               'Danışanlar sekmesinde tüm iletişim ve paket bilgisi tek yerde.'}
           </AppText>
           {profile.priority === 'randevu_kaosu' && (
             <Pressable
               onPress={() => router.push('/appointments')}
-              style={[styles.cta, { backgroundColor: c.primary + '22' }]}>
+              style={[styles.cta, { backgroundColor: c.primarySubtle }]}>
               <AppText style={{ color: c.primary, fontWeight: '700' }}>Randevulara git →</AppText>
             </Pressable>
           )}
           {profile.priority === 'odeme_takibi' && (
             <Pressable
               onPress={() => router.push('/clients')}
-              style={[styles.cta, { backgroundColor: c.primary + '22' }]}>
+              style={[styles.cta, { backgroundColor: c.primarySubtle }]}>
               <AppText style={{ color: c.primary, fontWeight: '700' }}>Danışanlar →</AppText>
             </Pressable>
           )}
@@ -194,7 +210,7 @@ export default function DashboardScreen() {
       )}
 
       {(profile.stationCount > 0 || profile.instructorCount > 0) && (
-        <Card style={styles.capacityCard}>
+        <Card accent="clinical" style={styles.capacityCard}>
           <AppText variant="caption" muted>
             Kapasite özeti (onboarding)
           </AppText>
@@ -226,68 +242,32 @@ export default function DashboardScreen() {
       )}
 
       <View style={styles.row}>
-        <Card style={[styles.stat, { flex: 1 }]}>
-          <AppText variant="caption" muted>
-            Bugün
-          </AppText>
-          <AppText variant="title" style={{ marginTop: 6, color: c.primary }}>
-            {todayCount}
-          </AppText>
-          <AppText variant="caption" muted style={{ marginTop: 4 }}>
-            randevu
-          </AppText>
-        </Card>
-        <View style={{ width: 12 }} />
-        <Card style={[styles.stat, { flex: 1 }]}>
-          <AppText variant="caption" muted>
-            7 gün
-          </AppText>
-          <AppText variant="title" style={{ marginTop: 6, color: c.accent }}>
-            {weekCount}
-          </AppText>
-          <AppText variant="caption" muted style={{ marginTop: 4 }}>
-            randevu
-          </AppText>
-        </Card>
+        <StatCard label="Bugün" value={todayCount} hint="randevu" accentColor={c.primary} />
+        <View style={{ width: spacing.md }} />
+        <StatCard label="7 gün" value={weekCount} hint="randevu" accentColor={c.accent} />
       </View>
 
-      <Card style={styles.statWide}>
-        <AppText variant="caption" muted>
-          Kayıtlı danışan
-        </AppText>
-        <AppText variant="title" style={{ marginTop: 6 }}>
-          {state.clients.length}
-        </AppText>
-      </Card>
+      <StatCard
+        label="Kayıtlı danışan"
+        value={state.clients.length}
+        style={{ marginTop: spacing.md }}
+      />
 
-      {isSupabaseConfigured() && (
+      {showCloudPanel && (
         <>
           <AppText variant="subtitle" style={styles.sectionTitle}>
-            Bulut (Supabase)
+            Bulut senkronu
           </AppText>
-          {!cloudStudioId ? (
-            <Card>
-              <AppText variant="body" style={{ fontWeight: '600' }}>
-                Stüdyo bağlantısı eksik
-              </AppText>
-              <AppText variant="muted" style={{ marginTop: 8, lineHeight: 20 }}>
-                Özet için bir stüdyo UUID gerekir: onboarding tamamlandığında Zustand&apos;a
-                yazılacak veya `.env` içinde `EXPO_PUBLIC_DEFAULT_STUDIO_ID` tanımlayın.
-              </AppText>
-            </Card>
-          ) : cloudLoading ? (
+          {cloudLoading ? (
             <Card style={styles.cloudCard}>
               <ActivityIndicator color={c.primary} />
               <AppText variant="muted" style={{ marginTop: 10 }}>
-                Supabase verisi yükleniyor…
+                Senkron verisi yükleniyor…
               </AppText>
             </Card>
           ) : cloudError != null ? (
             <Card>
-              <AppText style={{ color: c.danger }}>{cloudError}</AppText>
-              <Pressable onPress={() => void loadCloudDashboard()} style={styles.cloudRetry}>
-                <AppText style={{ color: c.primary, fontWeight: '700' }}>Yenile</AppText>
-              </Pressable>
+              <AppText variant="muted">Bulut bağlantısı şu an kullanılamıyor. Yerel verileriniz etkilenmez.</AppText>
             </Card>
           ) : (
             <DashboardView
@@ -362,58 +342,24 @@ export default function DashboardScreen() {
                   Yoklama
                 </AppText>
                 <View style={styles.attRow}>
-                  <Pressable
-                    onPress={() =>
-                      setAttendance(a.id, att === 'present' ? 'unset' : 'present')
-                    }
-                    style={[
-                      styles.attChip,
-                      { borderColor: c.border },
-                      att === 'present' && { backgroundColor: '#22C55E', borderColor: '#22C55E' },
-                    ]}>
-                    <AppText
-                      style={{
-                        fontSize: 13,
-                        fontWeight: '600',
-                        color: att === 'present' ? '#fff' : c.text,
-                      }}>
-                      Geldi
-                    </AppText>
-                  </Pressable>
-                  <Pressable
-                    onPress={() =>
-                      setAttendance(a.id, att === 'absent' ? 'unset' : 'absent')
-                    }
-                    style={[
-                      styles.attChip,
-                      { borderColor: c.border },
-                      att === 'absent' && { backgroundColor: c.danger, borderColor: c.danger },
-                    ]}>
-                    <AppText
-                      style={{
-                        fontSize: 13,
-                        fontWeight: '600',
-                        color: att === 'absent' ? '#fff' : c.text,
-                      }}>
-                      Gelmedi
-                    </AppText>
-                  </Pressable>
-                  <Pressable
+                  <Chip
+                    label="Geldi"
+                    variant="success"
+                    selected={att === 'present'}
+                    onPress={() => setAttendance(a.id, att === 'present' ? 'unset' : 'present')}
+                  />
+                  <Chip
+                    label="Gelmedi"
+                    variant="danger"
+                    selected={att === 'absent'}
+                    onPress={() => setAttendance(a.id, att === 'absent' ? 'unset' : 'absent')}
+                  />
+                  <Chip
+                    label="Bekliyor"
+                    variant="primary"
+                    selected={att === 'unset'}
                     onPress={() => setAttendance(a.id, 'unset')}
-                    style={[
-                      styles.attChip,
-                      { borderColor: c.border },
-                      att === 'unset' && { backgroundColor: c.surface, borderColor: c.primary },
-                    ]}>
-                    <AppText
-                      style={{
-                        fontSize: 13,
-                        fontWeight: '600',
-                        color: att === 'unset' ? c.primary : c.textMuted,
-                      }}>
-                      Bekliyor
-                    </AppText>
-                  </Pressable>
+                  />
                 </View>
               </View>
             </View>
@@ -426,19 +372,15 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  content: { paddingTop: 12 },
-  headline: { marginBottom: 4 },
-  sub: { marginBottom: 20 },
+  content: { paddingTop: 0 },
   row: { flexDirection: 'row' },
-  stat: { minHeight: 112 },
-  statWide: { marginTop: 12 },
-  sectionTitle: { marginTop: 28, marginBottom: 6 },
-  legendHint: { marginBottom: 10, lineHeight: 18 },
+  sectionTitle: { marginTop: spacing.xxl, marginBottom: spacing.sm },
+  legendHint: { marginBottom: spacing.sm, lineHeight: 18 },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 14,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: {
@@ -447,8 +389,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   apptCard: {
-    marginBottom: 12,
-    borderRadius: 20,
+    marginBottom: spacing.md,
+    borderRadius: radius.xl,
     borderLeftWidth: 5,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -469,23 +411,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   attendanceBlock: { marginTop: 14, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth },
-  attLabel: { marginBottom: 8 },
-  attRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  attChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  priorityCard: { marginBottom: 12 },
-  capacityCard: { marginBottom: 12 },
+  attLabel: { marginBottom: spacing.sm },
+  attRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  priorityCard: { marginBottom: spacing.md },
+  capacityCard: { marginBottom: spacing.md },
   cta: {
-    marginTop: 12,
-    paddingVertical: 12,
+    marginTop: spacing.md,
+    paddingVertical: spacing.md,
     paddingHorizontal: 14,
-    borderRadius: 12,
+    borderRadius: radius.md,
     alignSelf: 'flex-start',
   },
   cloudCard: { alignItems: 'center', paddingVertical: 20 },
-  cloudRetry: { marginTop: 12, alignSelf: 'flex-start' },
 });

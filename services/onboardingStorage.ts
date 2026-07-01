@@ -14,3 +14,7 @@ export async function hasCompletedOnboarding(): Promise<boolean> {
 export async function setOnboardingCompleted(): Promise<void> {
   await AsyncStorage.setItem(KEY, '1');
 }
+
+export async function clearOnboardingCompleted(): Promise<void> {
+  await AsyncStorage.removeItem(KEY);
+}

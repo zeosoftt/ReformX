@@ -6,6 +6,9 @@ import { Fab } from '@/components/Fab';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/ui/AppText';
 import { Card } from '@/components/ui/Card';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { brand } from '@/constants/brand';
+import { layout, radius, spacing } from '@/constants/theme';
 import { useStudio } from '@/context/StudioContext';
 import type { Appointment } from '@/types/studio';
 import { useAppColors } from '@/hooks/useAppColors';
@@ -59,17 +62,19 @@ export default function AppointmentsScreen() {
   }
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <AppText variant="title">Randevular</AppText>
-        <AppText variant="muted" style={{ marginTop: 4 }}>
-          Tüm seanslar; düzenlemek için dokunun.
-        </AppText>
-      </View>
+    <Screen padded={false}>
       <FlatList
         style={styles.listFlex}
         data={sorted}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <PageHeader
+            title="Seans & randevular"
+            subtitle="Pilates ve fizyoterapi seans takvimi — düzenlemek için dokunun."
+            style={styles.header}
+          />
+        }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <Card>
@@ -83,14 +88,16 @@ export default function AppointmentsScreen() {
               <Pressable onPress={() => openEdit(item)} onLongPress={() => confirmDelete(item)}>
                 <View style={styles.rowHead}>
                   <AppText variant="subtitle">{client?.name ?? 'Danışan'}</AppText>
-                  <AppText variant="caption" style={{ color: c.primary, fontWeight: '700' }}>
-                    {item.sessionType}
-                  </AppText>
+                  <View style={[styles.typePill, { backgroundColor: c.primarySubtle }]}>
+                    <AppText variant="caption" style={{ color: c.primary, fontWeight: '700' }}>
+                      {item.sessionType}
+                    </AppText>
+                  </View>
                 </View>
-                <AppText variant="body" style={{ marginTop: 8 }}>
+                <AppText variant="body" style={{ marginTop: spacing.sm }}>
                   {formatDateTime(item.startAt)}
                 </AppText>
-                <AppText variant="muted" style={{ marginTop: 4 }}>
+                <AppText variant="muted" style={{ marginTop: spacing.xs }}>
                   {item.durationMinutes} dakika
                   {item.notes ? ` · ${item.notes}` : ''}
                 </AppText>
@@ -115,13 +122,26 @@ export default function AppointmentsScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  header: { paddingHorizontal: 20, paddingBottom: 8 },
+  header: {
+    paddingHorizontal: layout.screenPaddingHorizontal,
+    paddingTop: spacing.sm,
+  },
   listFlex: { flex: 1 },
-  list: { paddingHorizontal: 20, paddingBottom: 96, gap: 10 },
+  list: {
+    paddingHorizontal: layout.screenPaddingHorizontal,
+    paddingBottom: layout.fabClearance,
+    gap: spacing.md,
+  },
   rowCard: { marginBottom: 0 },
   rowHead: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  typePill: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
   },
 });

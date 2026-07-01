@@ -1,15 +1,16 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
+import { layout } from '@/constants/theme';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={24} style={{ marginBottom: -2 }} {...props} />;
+  return <FontAwesome size={22} style={{ marginBottom: -2 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -20,14 +21,25 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.tint,
+        tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
           backgroundColor: theme.surface,
           borderTopColor: theme.border,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          height: Platform.OS === 'ios' ? layout.tabBarHeight + 8 : layout.tabBarHeight,
+          paddingTop: 6,
+          paddingBottom: Platform.OS === 'ios' ? 10 : 8,
           elevation: 0,
+          ...(Platform.OS === 'web'
+            ? {
+                maxWidth: layout.maxContentWidth,
+                alignSelf: 'center',
+                width: '100%',
+              }
+            : {}),
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
       }}>
       <Tabs.Screen
         name="index"
@@ -46,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="appointments"
         options={{
-          title: 'Randevular',
+          title: 'Seanslar',
           tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
         }}
       />

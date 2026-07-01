@@ -1,5 +1,6 @@
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
+import { radius, spacing } from '@/constants/theme';
 import { AppText } from '@/components/ui/AppText';
 import { useAppColors } from '@/hooks/useAppColors';
 
@@ -22,14 +23,14 @@ export function TextField({ label, error, style, ...rest }: Props) {
           {
             color: c.text,
             borderColor: error ? c.danger : c.border,
-            backgroundColor: c.background,
+            backgroundColor: c.surface,
           },
           style,
         ]}
         {...rest}
       />
       {error != null && error !== '' ? (
-        <AppText variant="caption" style={{ color: c.danger, marginTop: 4 }}>
+        <AppText variant="caption" style={{ color: c.danger, marginTop: spacing.xs }}>
           {error}
         </AppText>
       ) : null}
@@ -38,11 +39,11 @@ export function TextField({ label, error, style, ...rest }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 12 },
+  wrap: { marginBottom: spacing.md },
   label: { marginBottom: 6 },
   input: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,

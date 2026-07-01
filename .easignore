@@ -1,0 +1,11 @@
+node_modules/
+.git/
+.expo/
+dist/
+web-build/
+*.md
+!README.md
+android/
+ios/
+.env
+.env.*

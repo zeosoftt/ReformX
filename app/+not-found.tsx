@@ -1,19 +1,26 @@
-import { Link, Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
+import { Screen } from '@/components/Screen';
+import { AppButton } from '@/components/ui/AppButton';
+import { AppText } from '@/components/ui/AppText';
+import { spacing } from '@/constants/theme';
 
 export default function NotFoundScreen() {
+  const router = useRouter();
+
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
-
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
+      <Stack.Screen options={{ title: 'Sayfa bulunamadı' }} />
+      <Screen contentStyle={styles.container}>
+        <AppText variant="title" style={styles.title}>
+          Bu sayfa yok
+        </AppText>
+        <AppText variant="muted" style={styles.sub}>
+          Adres yanlış olabilir veya sayfa taşınmış olabilir.
+        </AppText>
+        <AppButton label="Ana ekrana dön" onPress={() => router.replace('/')} />
+      </Screen>
     </>
   );
 }
@@ -23,18 +30,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingTop: spacing.xxxl,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+  title: { textAlign: 'center' },
+  sub: { marginTop: spacing.sm, marginBottom: spacing.xl, textAlign: 'center', maxWidth: 320 },
 });
