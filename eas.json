@@ -38,6 +38,12 @@
     }
   },
   "submit": {
+    "preview": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    },
     "production": {
       "android": {
         "track": "internal",
