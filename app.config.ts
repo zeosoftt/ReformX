@@ -82,7 +82,7 @@ const config: ExpoConfig = {
     supportEmail: process.env.EXPO_PUBLIC_SUPPORT_EMAIL ?? 'destek@onboardhealth.app',
     privacyPolicyUrl: process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL ?? '',
     eas: {
-      projectId: '11306333-1525-41fc-a745-5603cf3efd51',
+      projectId: 'ec9aded0-b024-4e83-a21e-63eaf48b35f8',
     },
   },
 };
