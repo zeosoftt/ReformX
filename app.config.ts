@@ -81,6 +81,9 @@ const config: ExpoConfig = {
   extra: {
     supportEmail: process.env.EXPO_PUBLIC_SUPPORT_EMAIL ?? 'destek@onboardhealth.app',
     privacyPolicyUrl: process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL ?? '',
+    eas: {
+      projectId: '11306333-1525-41fc-a745-5603cf3efd51',
+    },
   },
 };
 

@@ -28,16 +28,13 @@
       }
     },
     "production": {
-      "autoIncrement": true,
       "env": {
         "EAS_BUILD_PROFILE": "production"
       },
       "android": {
         "buildType": "app-bundle"
       },
-      "ios": {
-        "autoIncrement": true
-      }
+      "ios": {}
     }
   },
   "submit": {
